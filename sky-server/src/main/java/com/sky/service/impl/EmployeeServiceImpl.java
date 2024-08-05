@@ -68,6 +68,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     /**
      * 新增员工
+     *
      * @param employeeDTO
      */
 
@@ -75,7 +76,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         Employee employee = new Employee();
 
         //对象属性拷贝
-        BeanUtils.copyProperties(employeeDTO,employee);
+        BeanUtils.copyProperties(employeeDTO, employee);
 
         //设置账号的状态，默认正常状态 1正常 0锁定
         employee.setStatus(StatusConstant.ENABLE);
@@ -94,20 +95,40 @@ public class EmployeeServiceImpl implements EmployeeService {
         employeeMapper.insert(employee);
 
 
-
     }
 
 
     public PageResult pagequery(EmployeePageQueryDTO employeePageQueryDTO) {
         // select * from employee limit 0,10
         //开始分页查询
-        PageHelper.startPage(employeePageQueryDTO.getPage(),employeePageQueryDTO.getPageSize());
+        PageHelper.startPage(employeePageQueryDTO.getPage(), employeePageQueryDTO.getPageSize());
         Page<Employee> page = employeeMapper.pageQuery(employeePageQueryDTO);
 
         Long total = page.getTotal();
         List<Employee> result = page.getResult();
 
 
-        return new PageResult(total,result);
+        return new PageResult(total, result);
+    }
+
+    /**
+     * 启用禁用员工账号
+     *
+     * @param status
+     * @param id
+     */
+    @Override
+    public void startOrStop(Integer status, Long id) {
+        // update employee set status = ? where id = ?
+
+        //直接用mapper的update进行动态更新，创建一个实体类传进去
+        /*Employee employee = new Employee();
+        employee.setStatus(status);
+        employee.setId(id);*/
+        Employee employee = Employee.builder()
+                .status(status)
+                .id(id)
+                .build();
+        employeeMapper.update(employee);
     }
 }
